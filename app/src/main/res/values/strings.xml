@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">BREWDOG Catalogue</string>
+    <string name="name">name</string>
+    <string name="abv">%s%%</string>
+    <string name="ibu">%s</string>
+    <string name="og">%s%%</string>
+    <string name="beerLogo">BeerLogo</string>
+    <string name="tag">tag</string>
+    <string name="maltsLabel">MALTS</string>
+    <string name="hopsLabel">HOPS</string>
+    <string name="abvLabel">ABV:&#160;</string>
+    <string name="ibuLabel">IBU:&#160;</string>
+    <string name="ogLabel">OG:&#160;</string>
+    <string name="item_favourite">Favorite</string>
+    <string name="avgToolTip">Alcohol by Volume</string>
+    <string name="ibuTooltip">International Bitterness Unit</string>
+    <string name="ogTooltip">Gravity</string>
+    <string name="item_filter">Filter</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

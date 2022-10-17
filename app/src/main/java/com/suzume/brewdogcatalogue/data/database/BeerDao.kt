@@ -1,15 +1,11 @@
 package com.suzume.brewdogcatalogue.data.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.paging.PagingSource
+import androidx.room.*
 
 @Dao
 interface BeerDao {
-    @Query("SELECT * FROM beers ORDER BY id")
-    fun getBeersList(): LiveData<List<BeerInfoDbModel>>
 
     @Query("SELECT * FROM beers WHERE id = :id")
     fun getBeerFromDb(id: Int): LiveData<BeerInfoDbModel>
@@ -25,4 +21,16 @@ interface BeerDao {
 
     @Query("UPDATE beers SET favourite = 0 WHERE id = :id")
     suspend fun favouriteOff(id: Int)
+
+    @Query("SELECT * FROM beers ORDER BY id")
+    fun getPagingSource(): PagingSource<Int, BeerInfoDbModel>
+
+    @Query("DELETE FROM beers")
+    fun clear()
+
+    @Transaction
+    suspend fun refresh(beerInfoDtoList: List<BeerInfoDbModel>) {
+        clear()
+        insertBeerList(beerInfoDtoList)
+    }
 }

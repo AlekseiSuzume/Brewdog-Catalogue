@@ -2,6 +2,7 @@ package com.suzume.brewdogcatalogue.di
 
 import com.suzume.brewdogcatalogue.App
 import com.suzume.brewdogcatalogue.data.database.BeerDao
+import com.suzume.brewdogcatalogue.data.database.RemoteKeyDao
 import com.suzume.brewdogcatalogue.data.network.ApiFactory
 import com.suzume.brewdogcatalogue.data.network.ApiService
 import com.suzume.brewdogcatalogue.data.repository.BeerRepositoryImpl
@@ -22,6 +23,11 @@ interface DataModule {
         @Provides
         fun provideBeerDao(): BeerDao {
             return App.getDatabase().beersDao()
+        }
+
+        @Provides
+        fun provideRemoteKeyDao(): RemoteKeyDao {
+            return App.getDatabase().remoteKeyDao()
         }
 
         @Provides

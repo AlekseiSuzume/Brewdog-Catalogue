@@ -6,12 +6,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.LoadState
 import com.suzume.brewdogcatalogue.App
 import com.suzume.brewdogcatalogue.R
 import com.suzume.brewdogcatalogue.databinding.ActivityMainBinding
-import com.suzume.brewdogcatalogue.presentation.adapter.BeerAdapter
+import com.suzume.brewdogcatalogue.presentation.adapter.PagingBeerAdapter
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -25,8 +27,8 @@ class MainActivity : AppCompatActivity() {
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }
-    private val beerAdapter by lazy {
-        BeerAdapter()
+    private val pagingBeerAdapter by lazy {
+        PagingBeerAdapter()
     }
 
     private val component by lazy {
@@ -39,21 +41,23 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         init()
+        observeViewModel()
         setupClickListener()
         setupLongClickListener()
-        setupReachEndListener()
-        observeViewModel()
 
     }
 
     private fun init() {
-        viewModel.loadData()
-        binding.recyclerView.adapter = beerAdapter
+        binding.recyclerView.adapter = pagingBeerAdapter
+        pagingBeerAdapter.addLoadStateListener { combinedLoadStates ->
+            binding.recyclerView.isVisible = combinedLoadStates.refresh != LoadState.Loading
+            binding.progress?.isVisible = combinedLoadStates.refresh == LoadState.Loading
+        }
     }
 
     private fun observeViewModel() {
-        viewModel.beerList.observe(this) {
-            beerAdapter.submitList(it)
+        viewModel.beerList.observe(this@MainActivity) { data ->
+            pagingBeerAdapter.submitData(lifecycle, data)
         }
     }
 
@@ -75,7 +79,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListener() {
-        beerAdapter.onBeerClickListener = {
+        pagingBeerAdapter.onBeerClickListener = {
             if (isVerticalOrientation()) {
                 launchActivity(BeerInfoActivity.newIntent(this@MainActivity, it.id))
             } else {
@@ -85,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupLongClickListener() {
-        beerAdapter.onBeerLongClickListener = {
+        pagingBeerAdapter.onBeerLongClickListener = {
             if (it.favourite) {
                 viewModel.removeFavorite(it.id)
                 Toast.makeText(this, "${it.name}\nDelete from favorite", Toast.LENGTH_SHORT)
@@ -94,12 +98,6 @@ class MainActivity : AppCompatActivity() {
                 viewModel.addFavorite(it.id)
                 Toast.makeText(this, "${it.name}\nAdd to favorite", Toast.LENGTH_SHORT).show()
             }
-        }
-    }
-
-    private fun setupReachEndListener() {
-        beerAdapter.onReachEndListener = {
-            viewModel.loadData(it)
         }
     }
 

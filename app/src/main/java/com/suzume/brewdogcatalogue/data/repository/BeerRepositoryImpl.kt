@@ -3,6 +3,10 @@ package com.suzume.brewdogcatalogue.data.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
+import androidx.paging.*
+import com.suzume.brewdogcatalogue.data.MyRemoteMediator
+import com.suzume.brewdogcatalogue.data.MyRemoteMediator3
 import com.suzume.brewdogcatalogue.data.database.BeerDao
 import com.suzume.brewdogcatalogue.data.mapper.Mapper
 import com.suzume.brewdogcatalogue.data.network.ApiService
@@ -14,20 +18,22 @@ class BeerRepositoryImpl @Inject constructor(
     private val dao: BeerDao,
     private val apiService: ApiService,
     private val mapper: Mapper,
+    private val myRemoteMediator: MyRemoteMediator,
 ) : BeerRepository {
 
-    override suspend fun loadData(page: Int) {
-        try {
-            val data = apiService.loadData(page = page)
-            dao.insertBeerList(data.map { mapper.mapBeerInfoDtoToDbModel(it) })
-        } catch (e: Exception) {
+    override fun loadData(): LiveData<PagingData<BeerInfoEntity>> {
+        @OptIn(ExperimentalPagingApi::class)
+        return Pager(
+            PagingConfig(pageSize = ITEM_PER_PAGE, initialLoadSize = 1),
+            remoteMediator = myRemoteMediator
+        ) {
+            dao.getPagingSource()
+        }.liveData.map { pagingData ->
+            pagingData.map { beerInfoDbModel ->
+                mapper.mapBeerInfoDbModelToEntity(beerInfoDbModel)
+            }
         }
     }
-
-    override fun getBeerInfoList(): LiveData<List<BeerInfoEntity>> =
-        Transformations.map(dao.getBeersList()) {
-            it.map { mapper.mapBeerInfoDbModelToEntity(it) }
-        }
 
     override fun getBeerInfo(id: Int): LiveData<BeerInfoEntity> =
         Transformations.map(dao.getBeerFromDb(id)) {
@@ -47,5 +53,9 @@ class BeerRepositoryImpl @Inject constructor(
     override suspend fun removeFavorite(id: Int) {
         dao.favouriteOff(id)
         Log.d("MyTest", "$dao\n$apiService\n$this")
+    }
+
+    companion object {
+        private const val ITEM_PER_PAGE = 50
     }
 }

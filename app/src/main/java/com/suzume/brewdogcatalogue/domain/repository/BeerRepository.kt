@@ -1,13 +1,13 @@
 package com.suzume.brewdogcatalogue.domain.repository
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingData
 import com.suzume.brewdogcatalogue.domain.entity.BeerInfoEntity
 
 interface BeerRepository {
 
-    suspend fun loadData(page: Int)
 
-    fun getBeerInfoList(): LiveData<List<BeerInfoEntity>>
+    fun loadData(): LiveData<PagingData<BeerInfoEntity>>
 
     fun getBeerInfo(id: Int): LiveData<BeerInfoEntity>
 

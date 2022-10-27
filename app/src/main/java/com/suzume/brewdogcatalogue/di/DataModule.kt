@@ -1,7 +1,8 @@
 package com.suzume.brewdogcatalogue.di
 
-import com.suzume.brewdogcatalogue.App
+import android.app.Application
 import com.suzume.brewdogcatalogue.data.database.BeerDao
+import com.suzume.brewdogcatalogue.data.database.BeerDatabase
 import com.suzume.brewdogcatalogue.data.database.RemoteKeyDao
 import com.suzume.brewdogcatalogue.data.network.ApiFactory
 import com.suzume.brewdogcatalogue.data.network.ApiService
@@ -20,16 +21,19 @@ interface DataModule {
 
     companion object {
 
+        @ApplicationScope
         @Provides
-        fun provideBeerDao(): BeerDao {
-            return App.getDatabase().beersDao()
+        fun provideBeerDao(application: Application): BeerDao {
+            return BeerDatabase.getInstance(application).beersDao()
         }
 
+        @ApplicationScope
         @Provides
-        fun provideRemoteKeyDao(): RemoteKeyDao {
-            return App.getDatabase().remoteKeyDao()
+        fun provideRemoteKeyDao(application: Application): RemoteKeyDao {
+            return BeerDatabase.getInstance(application).remoteKeyDao()
         }
 
+        @ApplicationScope
         @Provides
         fun provideApiService(): ApiService {
             return ApiFactory.apiService

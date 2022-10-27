@@ -1,11 +1,9 @@
 package com.suzume.brewdogcatalogue.data.network.model
 
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class BeerInfoDto(
 
-    @PrimaryKey
     @SerializedName("id")
     val id: Int,
 

@@ -81,8 +81,8 @@ class MyRemoteMediator @Inject constructor(
 
     private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, BeerInfoDbModel>): RemoteKey? {
         return state.anchorPosition?.let { position ->
-            state.closestItemToPosition(position)?.id?.let { repoId ->
-                keysDao.remoteKeysRepoId(repoId)
+            state.closestItemToPosition(position)?.id?.let { id ->
+                keysDao.remoteKeysRepoId(id)
             }
         }
     }
